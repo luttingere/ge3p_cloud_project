@@ -1355,7 +1355,7 @@ class ServerRequest implements ArrayAccess, ServerRequestInterface
      */
     public function acceptLanguage($language = null)
     {
-        $raw = $this->_parseAcceptWithQualifier($this->getHeaderLine('Accept-Language'));
+        $raw = $this->_parseAcceptWithQualifier($this->getHeaderLine('Accept-LanguageTable'));
         $accept = [];
         foreach ($raw as $languages) {
             foreach ($languages as &$lang) {

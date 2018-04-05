@@ -65,7 +65,7 @@ class LanguageConstructSpacingSniff implements Sniff
         if ($tokens[($stackPtr + 1)]['code'] === T_WHITESPACE) {
             $content = $tokens[($stackPtr + 1)]['content'];
             if ($content !== ' ') {
-                $error = 'Language constructs must be followed by a single space; expected 1 space but found "%s"';
+                $error = 'LanguageTable constructs must be followed by a single space; expected 1 space but found "%s"';
                 $data  = [Util\Common::prepareForOutput($content)];
                 $fix   = $phpcsFile->addFixableError($error, $stackPtr, 'IncorrectSingle', $data);
                 if ($fix === true) {
@@ -73,7 +73,7 @@ class LanguageConstructSpacingSniff implements Sniff
                 }
             }
         } else if ($tokens[($stackPtr + 1)]['code'] !== T_OPEN_PARENTHESIS) {
-            $error = 'Language constructs must be followed by a single space; expected "%s" but found "%s"';
+            $error = 'LanguageTable constructs must be followed by a single space; expected "%s" but found "%s"';
             $data  = [
                 $tokens[$stackPtr]['content'].' '.$tokens[($stackPtr + 1)]['content'],
                 $tokens[$stackPtr]['content'].$tokens[($stackPtr + 1)]['content'],

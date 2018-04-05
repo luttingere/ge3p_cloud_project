@@ -22,7 +22,7 @@ use Cake\Filesystem\Folder;
 use Cake\Utility\Inflector;
 
 /**
- * Language string extractor
+ * LanguageTable string extractor
  */
 class ExtractTask extends Shell
 {
@@ -312,7 +312,7 @@ class ExtractTask extends Shell
     {
         $parser = parent::getOptionParser();
         $parser->setDescription(
-            'CakePHP Language String Extraction:'
+            'CakePHP LanguageTable String Extraction:'
         )->addOption('app', [
             'help' => 'Directory where your application is located.'
         ])->addOption('paths', [
@@ -601,7 +601,7 @@ class ExtractTask extends Shell
         $output .= '"POT-Creation-Date: ' . date('Y-m-d H:iO') . "\\n\"\n";
         $output .= "\"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\\n\"\n";
         $output .= "\"Last-Translator: NAME <EMAIL@ADDRESS>\\n\"\n";
-        $output .= "\"Language-Team: LANGUAGE <EMAIL@ADDRESS>\\n\"\n";
+        $output .= "\"LanguageTable-Team: LANGUAGE <EMAIL@ADDRESS>\\n\"\n";
         $output .= "\"MIME-Version: 1.0\\n\"\n";
         $output .= "\"Content-Type: text/plain; charset=utf-8\\n\"\n";
         $output .= "\"Content-Transfer-Encoding: 8bit\\n\"\n";

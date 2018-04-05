@@ -81,7 +81,7 @@ class I18nShell extends Shell
     /**
      * Inits PO file from POT file.
      *
-     * @param string|null $language Language code to use.
+     * @param string|null $language LanguageTable code to use.
      * @return void
      * @throws \Cake\Console\Exception\StopException
      */

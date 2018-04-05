@@ -19,7 +19,7 @@ class ReflectionLanguageConstruct extends \ReflectionFunctionAbstract
     public $keyword;
 
     /**
-     * Language construct parameter definitions.
+     * LanguageTable construct parameter definitions.
      */
     private static $languageConstructs = array(
         'isset' => array(

@@ -20,7 +20,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Sets the runtime default locale for the request based on the
- * Accept-Language header. The default will only be set if it
+ * Accept-LanguageTable header. The default will only be set if it
  * matches the list of passed valid locales.
  */
 class LocaleSelectorMiddleware
@@ -51,7 +51,7 @@ class LocaleSelectorMiddleware
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $next)
     {
-        $locale = Locale::acceptFromHttp($request->getHeaderLine('Accept-Language'));
+        $locale = Locale::acceptFromHttp($request->getHeaderLine('Accept-LanguageTable'));
         if (!$locale) {
             return $next($request, $response);
         }

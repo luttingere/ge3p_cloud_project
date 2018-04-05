@@ -1598,7 +1598,7 @@ class Response implements ResponseInterface
         $remove = [
             'Allow',
             'Content-Encoding',
-            'Content-Language',
+            'Content-LanguageTable',
             'Content-Length',
             'Content-MD5',
             'Content-Type',
@@ -1625,7 +1625,7 @@ class Response implements ResponseInterface
         $remove = [
             'Allow',
             'Content-Encoding',
-            'Content-Language',
+            'Content-LanguageTable',
             'Content-Length',
             'Content-MD5',
             'Content-Type',

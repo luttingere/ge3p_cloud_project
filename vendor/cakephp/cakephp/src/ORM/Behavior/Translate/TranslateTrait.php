@@ -29,7 +29,7 @@ trait TranslateTrait
      * present, a new empty entity will be created so that values can be added to
      * it.
      *
-     * @param string $language Language to return entity for.
+     * @param string $language LanguageTable to return entity for.
      * @return $this|\Cake\Datasource\EntityInterface
      */
     public function translation($language)

@@ -21,7 +21,7 @@ use Locale;
 
 /**
  * Sets the runtime default locale for the request based on the
- * Accept-Language header. The default will only be set if it
+ * Accept-LanguageTable header. The default will only be set if it
  * matches the list of passed valid locales.
  */
 class LocaleSelectorFilter extends DispatcherFilter
@@ -49,7 +49,7 @@ class LocaleSelectorFilter extends DispatcherFilter
     }
 
     /**
-     * Inspects the request for the Accept-Language header and sets the
+     * Inspects the request for the Accept-LanguageTable header and sets the
      * Locale for the current runtime if it matches the list of valid locales
      * as passed in the configuration.
      *
@@ -60,7 +60,7 @@ class LocaleSelectorFilter extends DispatcherFilter
     {
         /* @var \Cake\Http\ServerRequest $request */
         $request = $event->getData('request');
-        $locale = Locale::acceptFromHttp($request->getHeaderLine('Accept-Language'));
+        $locale = Locale::acceptFromHttp($request->getHeaderLine('Accept-LanguageTable'));
 
         if (!$locale || (!empty($this->_locales) && !in_array($locale, $this->_locales))) {
             return;
