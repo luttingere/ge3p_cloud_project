@@ -56,7 +56,7 @@ class AttributesControllerHelper
         try {
             $attributesTable = TableRegistry::get("Attributes");
             $queryResult = $attributesTable->find()
-                ->where(array('attributes_id' => $attributesId))
+                ->where(array('attribute_id' => $attributesId))
                 ->enableHydration(false);
 
             if (!$this->GE3PController->isTheCursorEmpty($queryResult)) {
