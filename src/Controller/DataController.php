@@ -9,12 +9,12 @@
 namespace App\Controller;
 
 
-use App\ControllerHelpers\DataValueControllerHelper;
+use App\ControllerHelpers\DataControllerHelper;
 use Cake\Log\Log;
 
+define("DATA_CONTROLLER_NAME_SPACE", "Data");
 
-define("DATA_VALUE_CONTROLLER_NAME_SPACE", "DataValue");
-class DataValueController extends GE3PController
+class DataController extends GE3PController
 {
 
     public function getAll()
@@ -23,16 +23,16 @@ class DataValueController extends GE3PController
         try {
             //Variables esperadas por el servicio
             $arrayToBeTested = array();
-            $result = parent::runWebServiceInitialConfAndValidations($arrayToBeTested, DATA_VALUE_CONTROLLER_NAME_SPACE, __FUNCTION__);
+            $result = parent::runWebServiceInitialConfAndValidations($arrayToBeTested, DATA_CONTROLLER_NAME_SPACE, __FUNCTION__);
             if (parent::isASuccessfulResult($result[WEB_SERVICE_RESPONSE_SIGNATURE])) {
 
                 $jsonObject = $result[WEB_SERVICE_RESPONSE_SIGNATURE]['object'];
 
-                $dataValueControllerHelper = new DataValueControllerHelper($this);
+                $dataControllerHelper = new DataControllerHelper($this);
 
-                $dataValue = $dataValueControllerHelper->getAllDataValues();
+                $data = $dataControllerHelper->getAllData();
 
-                $result = parent::setSuccessfulResponseWithObject($result, $dataValue);
+                $result = parent::setSuccessfulResponseWithObject($result, $data);
             }
         } catch (\Exception $e) {
             Log::info("Error, " . __FUNCTION__ . " cause: " . $e->getMessage());
@@ -47,17 +47,17 @@ class DataValueController extends GE3PController
         $result = null;
         try {
             //Variables esperadas por el servicio
-            $arrayToBeTested = array('data_value_id');
-            $result = parent::runWebServiceInitialConfAndValidations($arrayToBeTested, DATA_VALUE_CONTROLLER_NAME_SPACE, __FUNCTION__);
+            $arrayToBeTested = array('data_id');
+            $result = parent::runWebServiceInitialConfAndValidations($arrayToBeTested, DATA_CONTROLLER_NAME_SPACE, __FUNCTION__);
             if (parent::isASuccessfulResult($result[WEB_SERVICE_RESPONSE_SIGNATURE])) {
 
                 $jsonObject = $result[WEB_SERVICE_RESPONSE_SIGNATURE]['object'];
 
-                $dataValueControllerHelper = new DataValueControllerHelper($this);
+                $dataControllerHelper = new DataControllerHelper($this);
 
-                $dataValue = $dataValueControllerHelper->getById($jsonObject['data_value_id']);
+                $data = $dataControllerHelper->getById($jsonObject['data_id']);
 
-                $result = parent::setSuccessfulResponseWithObject($result, array($dataValue));
+                $result = parent::setSuccessfulResponseWithObject($result, array($data));
             }
         } catch (\Exception $e) {
             Log::info("Error, " . __FUNCTION__ . " cause: " . $e->getMessage());
@@ -73,20 +73,21 @@ class DataValueController extends GE3PController
         $result = null;
         try {
             //Variables esperadas por el servicio
-            $arrayToBeTested = array('data_value' => array('data_value_name', 'language_id', 'data_value_type_id', 'data_value'));
+            $arrayToBeTested = array('data' => array('data_name', 'data_type_id'));
 
-            //se recive tambien los atributos a asociar de la siguiente manera
-            //$arrayToBeTested = array('data_value' => array('data_value_name', 'language_id', 'data_value_type_id', 'data_value'),
-            // 'attributes'=>array(array('attribute_id','attribute_value')));
+            //Ejemplo para almacenar un obteto tipo Data con data values
+            //se recive tambien los dataValues a asociar de la siguiente manera
+            // $arrayToBeTested = array('data' => array('data_name', 'data_type_id'),
+            // 'data_values'=>array(array('data_value_id'),array('data_value_id')));
 
-            $result = parent::runWebServiceInitialConfAndValidations($arrayToBeTested, DATA_VALUE_CONTROLLER_NAME_SPACE, __FUNCTION__);
+            $result = parent::runWebServiceInitialConfAndValidations($arrayToBeTested, DATA_CONTROLLER_NAME_SPACE, __FUNCTION__);
             if (parent::isASuccessfulResult($result[WEB_SERVICE_RESPONSE_SIGNATURE])) {
 
                 $jsonObject = $result[WEB_SERVICE_RESPONSE_SIGNATURE]['object'];
 
-                $dataValueControllerHelper = new DataValueControllerHelper($this);
+                $dataControllerHelper = new DataControllerHelper($this);
 
-                $savedDataValue = $dataValueControllerHelper->saveTransactional($jsonObject);
+                $savedDataValue = $dataControllerHelper->saveTransactional($jsonObject);
 
                 $result = parent::setSuccessfulResponseWithObject($result, array($savedDataValue));
             }
