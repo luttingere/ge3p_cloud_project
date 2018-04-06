@@ -79,10 +79,10 @@ class GE3PController extends AppController
      * Toma el objeto json que se recibe de la llamada y valida que en el existan los parametros esperados
      *
      *
-     * @param $parametersToBeTested arreglo de parametros que se esperan en la llamada
-     * @param $namespace nombre del controlador "en literal" de donde se recibe la llamada
+     * @param $parametersToBeTested array de parametros que se esperan en la llamada
+     * @param $namespace String (nombre) del controlador "en literal" de donde se recibe la llamada
      * @param $webServiceMethodName "nombre del metodo que se expone como servicio"
-     * @return arreglo con el codigo y mensajes del resultado de las validaciones iniciales con el objeto json recibido
+     * @return array con el codigo y mensajes del resultado de las validaciones iniciales con el objeto json recibido
      */
     public function runWebServiceInitialConfAndValidations($parametersToBeTested, $namespace, $webServiceMethodName)
     {

@@ -2,18 +2,17 @@
 /**
  * Created by PhpStorm.
  * User: luttinger
- * Date: 05/04/18
- * Time: 06:55 PM
+ * Date: 06/04/18
+ * Time: 07:41 AM
  */
 
 namespace App\Controller;
 
-use App\ControllerHelpers\AttributesControllerHelper;
+
+use App\ControllerHelpers\DataValueControllerHelper;
 use Cake\Log\Log;
 
-define("ATTRIBUTE_CONTROLLER_NAME_SPACE", "Attributes");
-
-class AttributesController extends GE3PController
+class DataValueController extends GE3PController
 {
 
     public function getAll()
@@ -27,11 +26,11 @@ class AttributesController extends GE3PController
 
                 $jsonObject = $result[WEB_SERVICE_RESPONSE_SIGNATURE]['object'];
 
-                $attributeControlHelper = new AttributesControllerHelper($this);
+                $dataValueControllerHelper = new DataValueControllerHelper($this);
 
-                $attributes = $attributeControlHelper->getAllAttributes();
+                $dataValue = $dataValueControllerHelper->getAllDataValues();
 
-                $result = parent::setSuccessfulResponseWithObject($result, $attributes);
+                $result = parent::setSuccessfulResponseWithObject($result, $dataValue);
             }
         } catch (\Exception $e) {
             Log::info("Error, " . __FUNCTION__ . " cause: " . $e->getMessage());
@@ -46,17 +45,17 @@ class AttributesController extends GE3PController
         $result = null;
         try {
             //Variables esperadas por el servicio
-            $arrayToBeTested = array('attribute_id');
+            $arrayToBeTested = array('data_value_id');
             $result = parent::runWebServiceInitialConfAndValidations($arrayToBeTested, ATTRIBUTE_CONTROLLER_NAME_SPACE, __FUNCTION__);
             if (parent::isASuccessfulResult($result[WEB_SERVICE_RESPONSE_SIGNATURE])) {
 
                 $jsonObject = $result[WEB_SERVICE_RESPONSE_SIGNATURE]['object'];
 
-                $attributeControlHelper = new AttributesControllerHelper($this);
+                $dataValueControllerHelper = new DataValueControllerHelper($this);
 
-                $attribute = $attributeControlHelper->getById($jsonObject['attribute_id']);
+                $dataValue = $dataValueControllerHelper->getById($jsonObject['data_value_id']);
 
-                $result = parent::setSuccessfulResponseWithObject($result, array($attribute));
+                $result = parent::setSuccessfulResponseWithObject($result, array($dataValue));
             }
         } catch (\Exception $e) {
             Log::info("Error, " . __FUNCTION__ . " cause: " . $e->getMessage());
@@ -72,17 +71,23 @@ class AttributesController extends GE3PController
         $result = null;
         try {
             //Variables esperadas por el servicio
-            $arrayToBeTested = array('attribute_name');
+            $arrayToBeTested = array('data_value_name', 'language_id', 'data_value_type_id', 'data_value');
+
+
+            //se recive tambien los atributos a asociar de la siguiente manera
+            //$arrayToBeTested = array('data_value_name', 'language_id', 'data_value_type_id', 'data_value',
+            // 'attributes'=>array(array('attribute_id','attribute_value')));
+
             $result = parent::runWebServiceInitialConfAndValidations($arrayToBeTested, ATTRIBUTE_CONTROLLER_NAME_SPACE, __FUNCTION__);
             if (parent::isASuccessfulResult($result[WEB_SERVICE_RESPONSE_SIGNATURE])) {
 
                 $jsonObject = $result[WEB_SERVICE_RESPONSE_SIGNATURE]['object'];
 
-                $attributeControlHelper = new AttributesControllerHelper($this);
+                $dataValueControllerHelper = new DataValueControllerHelper($this);
 
-                $attribute = $attributeControlHelper->save($jsonObject);
+                $savedDataValue = $dataValueControllerHelper->saveTransactional($jsonObject);
 
-                $result = parent::setSuccessfulResponseWithObject($result, array($attribute));
+                $result = parent::setSuccessfulResponseWithObject($result, array($savedDataValue));
             }
         } catch (\Exception $e) {
             Log::info("Error, " . __FUNCTION__ . " cause: " . $e->getMessage());
@@ -91,8 +96,5 @@ class AttributesController extends GE3PController
         }
         parent::returnAJson($result);
     }
-
-
-
 
 }
