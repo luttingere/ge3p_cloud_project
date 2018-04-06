@@ -82,7 +82,7 @@ class AttributesController extends GE3PController
 
                 $attribute = $attributeControlHelper->save($jsonObject);
 
-                $result = parent::setSuccessfulResponseWithObject($result, array($attribute));
+                $result = parent::setSuccessfulSaveResponseWithObject($result, array($attribute));
             }
         } catch (\Exception $e) {
             Log::info("Error, " . __FUNCTION__ . " cause: " . $e->getMessage());

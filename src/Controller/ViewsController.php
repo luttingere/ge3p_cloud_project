@@ -73,7 +73,7 @@ class ViewsController extends GE3PController
         $result = null;
         try {
             //Variables esperadas por el servicio
-            $arrayToBeTested = array('attribute_name');
+            $arrayToBeTested = array('view' => array('view_name'));
             $result = parent::runWebServiceInitialConfAndValidations($arrayToBeTested, VIEW_CONTROLLER_NAME_SPACE, __FUNCTION__);
             if (parent::isASuccessfulResult($result[WEB_SERVICE_RESPONSE_SIGNATURE])) {
 
@@ -81,9 +81,9 @@ class ViewsController extends GE3PController
 
                 $viewControllerHelper = new ViewControllerHelper($this);
 
-                $views = $viewControllerHelper->getById($jsonObject['view_id']);
+                $views = $viewControllerHelper->saveTransactional($jsonObject);
 
-                $result = parent::setSuccessfulResponseWithObject($result, $views);
+                $result = parent::setSuccessfulSaveResponseWithObject($result, $views);
             }
         } catch (\Exception $e) {
             Log::info("Error, " . __FUNCTION__ . " cause: " . $e->getMessage());

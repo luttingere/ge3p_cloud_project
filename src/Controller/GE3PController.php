@@ -230,14 +230,28 @@ class GE3PController extends AppController
     {
         $GE3PMessage[WEB_SERVICE_RESPONSE_SIGNATURE]['code'] = GE3PApiMessages::$SUCCESS_CODE;
         $GE3PMessage[WEB_SERVICE_RESPONSE_SIGNATURE]['message'] = GE3PApiMessages::$SUCCESS_MESSAGE;
+        if(!is_array($object)){
+            $object = array($object);
+        }
         $GE3PMessage[WEB_SERVICE_RESPONSE_SIGNATURE]['object'] = $object;
         return $GE3PMessage;
     }
 
-    public function setExceptionResponse($GE3PMessage, $e)
+    public function setSuccessfulSaveResponseWithObject($GE3PMessage, $object)
+    {
+        $GE3PMessage[WEB_SERVICE_RESPONSE_SIGNATURE]['code'] = GE3PApiMessages::$SUCCESS_CODE;
+        $GE3PMessage[WEB_SERVICE_RESPONSE_SIGNATURE]['message'] = GE3PApiMessages::$SUCCESS_SAVE_MESSAGE;
+        if(!is_array($object)){
+            $object = array($object);
+        }
+        $GE3PMessage[WEB_SERVICE_RESPONSE_SIGNATURE]['object'] = $object;
+        return $GE3PMessage;
+    }
+
+    public function setExceptionResponse($GE3PMessage, $errorMessage)
     {
         $GE3PMessage[WEB_SERVICE_RESPONSE_SIGNATURE]['code'] = GE3PApiMessages::$GENERAL_ERROR_CODE;
-        $GE3PMessage[WEB_SERVICE_RESPONSE_SIGNATURE]['message'] = $e->getMessage();
+        $GE3PMessage[WEB_SERVICE_RESPONSE_SIGNATURE]['message'] = $errorMessage->getMessage();
         $GE3PMessage[WEB_SERVICE_RESPONSE_SIGNATURE]['object'] = array();
         return $GE3PMessage;
     }

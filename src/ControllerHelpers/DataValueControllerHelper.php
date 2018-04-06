@@ -50,6 +50,8 @@ class DataValueControllerHelper
                 throw new \Exception("No DataValues found");
             }
 
+            $result = $this->deleteJoinMetaDataFromDataValueResult($result);
+
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
@@ -74,6 +76,8 @@ class DataValueControllerHelper
                 throw new \Exception("No DataValues found");
             }
 
+            $result = $this->deleteJoinMetaDataFromDataValueResult($result);
+
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
@@ -86,9 +90,11 @@ class DataValueControllerHelper
     public function saveTransactional($object)
     {
         try {
+
             $dataValueTable = TableRegistry::get("DataValue");
+            $dataValueAttributeRelTable = TableRegistry::get("DataValueAttributeRel");
             $connection = $dataValueTable->getConnection();
-            $savedObject = $connection->transactional(function ($dataValueTable, $object) {
+            $savedObject = $connection->transactional(function () use ($dataValueTable, $dataValueAttributeRelTable, $object) {
 
                 $savedObject = array();
 
@@ -98,15 +104,17 @@ class DataValueControllerHelper
 
                     array_push($savedObject, array('data_value' => $dataValueSaved));
 
-                    if (isset($object['attributes'])) {
-
-                        $dataValueAttributeRelTable = TableRegistry::get("DataValueAttributeRel");
+                    if (isset($object['attributes']) && is_array($object['attributes']) && sizeof($object['attributes'] > 0)) {
 
                         $attributesSuccessfullyAssociated = $this->associateAttributes($object['attributes'], $dataValueSaved['data_value_id'], $dataValueAttributeRelTable);
 
                         array_push($savedObject, array('attributes' => $attributesSuccessfullyAssociated));
 
                     } else {
+
+                        //se eliminan primero todos los attributos previamente asociados, a fin de no repetir atributos en un data value
+                        $dataValueAttributeRelTable->deleteAll(array('data_value_id' => $dataValueSaved['data_value_id']));
+
                         Log::warning("Data value saved without attributes");
                     }
 
@@ -120,11 +128,11 @@ class DataValueControllerHelper
             });
 
             return $savedObject;
-            
+
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception($e);
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -144,7 +152,7 @@ class DataValueControllerHelper
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception($e);
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -184,9 +192,27 @@ class DataValueControllerHelper
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception($e);
+            throw new \Exception($e->getMessage());
         }
 
+    }
+
+
+    private function deleteJoinMetaDataFromDataValueResult($dataValues)
+    {
+        foreach ($dataValues as &$dataValue) {
+
+            foreach ($dataValue['attributes'] as &$attributes) {
+
+                if (isset($attributes['_joinData'])) {
+
+                    unset($attributes['_joinData']);
+                }
+
+            }
+
+        }
+        return $dataValues;
     }
 
 

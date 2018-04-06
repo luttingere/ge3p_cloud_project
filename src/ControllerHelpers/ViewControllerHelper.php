@@ -49,7 +49,7 @@ class ViewControllerHelper
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception("Problems getting the system views");
+            throw new \Exception($e->getMessage());
         }
         return $result;
     }
@@ -76,13 +76,119 @@ class ViewControllerHelper
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception("Problems getting the system view by the id " . $viewId);
+            throw new \Exception($e->getMessage());
         }
         return $result;
     }
 
 
+    public function saveTransactional($object)
+    {
+        try {
 
+            $viewsTable = TableRegistry::get("Views");
+            $viewsDataRelTable = TableRegistry::get("ViewsDataRel");
+            $connection = $viewsTable->getConnection();
+            $savedObject = $connection->transactional(function () use ($viewsTable, $viewsDataRelTable, $object) {
+
+                $savedObject = array();
+
+                if (isset($object) && isset($object['view'])) {
+
+                    $viewSaved = $this->save($object['view'], $viewsTable);
+
+                    array_push($savedObject, array('view' => $viewSaved));
+
+                    if (isset($object['data']) && is_array($object['data']) && sizeof($object['data'] > 0)) {
+
+                        $dataSuccessfullyAssociated = $this->associateData($object['data'], $viewSaved['view_id'], $viewsDataRelTable);
+
+                        array_push($savedObject, array('data' => $dataSuccessfullyAssociated));
+
+                    } else {
+
+                        //se eliminan primero todos los attributos previamente asociados, a fin de no repetir atributos en un data value
+                        $viewsDataRelTable->deleteAll(array('view_id' => $viewSaved['view_id']));
+
+                        Log::warning("View saved without Data");
+                    }
+
+                } else {
+
+                    throw new \Exception("the views transactional object to save is not in a valid format or is null");
+
+                }
+
+                return $savedObject;
+            });
+
+            return $savedObject;
+
+        } catch (\Exception $e) {
+            Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
+            Log::error(__FUNCTION__, $e);
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+
+    private function save($viewObject, $viewsTable)
+    {
+        try {
+            if (!isset($viewsTable)) {
+                $viewsTable = TableRegistry::get("Views");
+            }
+            $viewsEntity = $viewsTable->newEntity($viewObject);
+            $saveResult = $viewsTable->save($viewsEntity);
+            if (!$saveResult) {
+                throw new \Exception("Problem Saving the View: " . json_encode($viewObject));
+            }
+            return $saveResult;
+        } catch (\Exception $e) {
+            Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
+            Log::error(__FUNCTION__, $e);
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    private function associateData($data, $viewId, $viewsDataRelTable)
+    {
+        try {
+            if (!isset($viewsDataRelTable)) {
+                $viewsDataRelTable = TableRegistry::get("ViewsDataRel");
+            }
+            if (is_array($data)) {
+
+                //se eliminan primero todos los objetos tipo data previamente asociados, a fin de no repetir Data en un view object
+                $viewsDataRelTable->deleteAll(array('view_id' => $viewId));
+
+                // por cada data recibida se asocian al view indicado
+                $associationsStored = array();
+                foreach ($data as $row) {
+
+                    $viewDataAssociationEntity = array(
+                        'view_id' => $viewId,
+                        'data_id' => $row['data_id']
+                    );
+
+                    $viewDataAssociationEntity = $viewsDataRelTable->newEntity($viewDataAssociationEntity);
+
+                    $associationSaved = $viewsDataRelTable->save($viewDataAssociationEntity);
+
+                    array_push($associationsStored, array($associationSaved));
+                }
+                return $associationsStored;
+
+            } else {
+                throw new \Exception("No Data to associate to the View " . $viewId);
+            }
+        } catch (\Exception $e) {
+            Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
+            Log::error(__FUNCTION__, $e);
+            throw new \Exception($e->getMessage());
+        }
+
+    }
 
 
     private function deleteJoinMetaDataFromViewsResult($viewsValues)

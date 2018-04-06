@@ -45,7 +45,7 @@ class AttributesControllerHelper
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception("Problems getting the system Attributes");
+            throw new \Exception($e->getMessage());
         }
         return $result;
     }
@@ -68,7 +68,7 @@ class AttributesControllerHelper
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception("Problems getting the system Attributes");
+            throw new \Exception($e->getMessage());
         }
         return $result;
     }
@@ -90,7 +90,7 @@ class AttributesControllerHelper
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception("Problems saving the attribute " . $attribute);
+            throw new \Exception($e->getMessage());
         }
     }
 

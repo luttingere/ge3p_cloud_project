@@ -50,10 +50,12 @@ class DataControllerHelper
                 throw new \Exception("No Data found");
             }
 
+            $result = $this->deleteJoinMetaDataFromDataResult($result);
+
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception("Problems getting the system Data");
+            throw new \Exception($e->getMessage());
         }
         return $result;
     }
@@ -74,10 +76,13 @@ class DataControllerHelper
                 throw new \Exception("No Data found");
             }
 
+
+            $result = $this->deleteJoinMetaDataFromDataResult($result);
+
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception("Problems getting the system Data");
+            throw new \Exception($e->getMessage());
         }
         return $result;
     }
@@ -86,9 +91,10 @@ class DataControllerHelper
     public function saveTransactional($object)
     {
         try {
-            $dataValueTable = TableRegistry::get("Data");
-            $connection = $dataValueTable->getConnection();
-            $savedObject = $connection->transactional(function ($dataTable, $object) {
+            $dataTable = TableRegistry::get("Data");
+            $dataValuesRelTable = TableRegistry::get("DataValuesRel");
+            $connection = $dataTable->getConnection();
+            $savedObject = $connection->transactional(function () use ($dataTable, $dataValuesRelTable, $object) {
 
                 $savedObject = array();
 
@@ -98,15 +104,17 @@ class DataControllerHelper
 
                     array_push($savedObject, array('data' => $dataSaved));
 
-                    if (isset($object['data_values'])) {
-
-                        $dataValuesRelTable = TableRegistry::get("DataValuesRel");
+                    if (isset($object['data_values']) && is_array($object['data_values']) && sizeof($object['data_values']) > 0) {
 
                         $DataValuesSuccessfullyAssociated = $this->associateDataValues($object['data_values'], $dataSaved['data_id'], $dataValuesRelTable);
 
                         array_push($savedObject, array('data_values' => $DataValuesSuccessfullyAssociated));
 
                     } else {
+
+                        //se eliminan primero todos los data values previamente asociados
+                        $dataValuesRelTable->deleteAll(array('data_id' => $dataSaved['data_id']));
+
                         Log::warning("Data saved without data values");
                     }
 
@@ -124,7 +132,7 @@ class DataControllerHelper
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception($e);
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -144,7 +152,7 @@ class DataControllerHelper
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception($e);
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -183,9 +191,33 @@ class DataControllerHelper
         } catch (\Exception $e) {
             Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
             Log::error(__FUNCTION__, $e);
-            throw new \Exception($e);
+            throw new \Exception($e->getMessage());
         }
 
+    }
+
+    private function deleteJoinMetaDataFromDataResult($data)
+    {
+        foreach ($data as &$row) {
+
+            foreach ($row['data_value'] as &$dataValues) {
+
+                if (isset($dataValues['_joinData'])) {
+                    unset($dataValues['_joinData']);
+                }
+
+                foreach ($dataValues['attributes'] as &$attributes) {
+
+                    if (isset($attributes['_joinData'])) {
+
+                        unset($attributes['_joinData']);
+                    }
+
+                }
+
+            }
+        }
+        return $data;
     }
 
 

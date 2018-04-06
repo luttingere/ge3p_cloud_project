@@ -89,7 +89,7 @@ class DataController extends GE3PController
 
                 $savedDataValue = $dataControllerHelper->saveTransactional($jsonObject);
 
-                $result = parent::setSuccessfulResponseWithObject($result, array($savedDataValue));
+                $result = parent::setSuccessfulSaveResponseWithObject($result,$savedDataValue);
             }
         } catch (\Exception $e) {
             Log::info("Error, " . __FUNCTION__ . " cause: " . $e->getMessage());
