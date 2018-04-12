@@ -230,7 +230,7 @@ return [
              */
             //'port' => 'non_standard_port_number',
             'username' => 'root',
-            'password' => 'zanahorio.1',
+            'password' => '2184',
             'database' => 'ge3p',
             'encoding' => 'utf8',
             'timezone' => 'UTC',

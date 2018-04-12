@@ -10,6 +10,7 @@ namespace App\ControllerHelpers;
 
 
 use App\Controller\GE3PController;
+use App\Controller\ViewsController;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
 
@@ -100,22 +101,30 @@ class DataValueControllerHelper
 
                 if (isset($object) && isset($object['data_value'])) {
 
-                    $dataValueSaved = $this->save($object['data_value'], $dataValueTable);
 
-                    array_push($savedObject, array('data_value' => $dataValueSaved));
+                    if($object['data_value']['data_value_type_id'] == 2)
+                    {
 
-                    if (isset($object['attributes']) && is_array($object['attributes']) && sizeof($object['attributes'] > 0)) {
+                    }
+                    else
+                    {
+                        $dataValueSaved = $this->save($object['data_value'], $dataValueTable);
 
-                        $attributesSuccessfullyAssociated = $this->associateAttributes($object['attributes'], $dataValueSaved['data_value_id'], $dataValueAttributeRelTable);
+                        array_push($savedObject, array('data_value' => $dataValueSaved));
 
-                        array_push($savedObject, array('attributes' => $attributesSuccessfullyAssociated));
+                        if (isset($object['attributes']) && is_array($object['attributes']) && sizeof($object['attributes'] > 0)) {
 
-                    } else {
+                            $attributesSuccessfullyAssociated = $this->associateAttributes($object['attributes'], $dataValueSaved['data_value_id'], $dataValueAttributeRelTable);
 
-                        //se eliminan primero todos los attributos previamente asociados, a fin de no repetir atributos en un data value
-                        $dataValueAttributeRelTable->deleteAll(array('data_value_id' => $dataValueSaved['data_value_id']));
+                            array_push($savedObject, array('attributes' => $attributesSuccessfullyAssociated));
 
-                        Log::warning("Data value saved without attributes");
+                        } else {
+
+                            //se eliminan primero todos los attributos previamente asociados, a fin de no repetir atributos en un data value
+                            $dataValueAttributeRelTable->deleteAll(array('data_value_id' => $dataValueSaved['data_value_id']));
+
+                            Log::warning("Data value saved without attributes");
+                        }
                     }
 
                 } else {
@@ -123,7 +132,8 @@ class DataValueControllerHelper
                     throw new \Exception("the data value transactional object to save is not in a valid format or is null");
 
                 }
-
+                $viewControllerHelper = new ViewControllerHelper(new ViewsController());
+                $viewControllerHelper->setViewChanges(1, false);
                 return $savedObject;
             });
 
@@ -213,6 +223,48 @@ class DataValueControllerHelper
 
         }
         return $dataValues;
+    }
+
+    public function getAllDataValueTypes()
+    {
+        $result = null;
+        try {
+            $dataValueTypeTable = TableRegistry::get("DataValueType");
+            $queryResult = $dataValueTypeTable->find();
+
+            if (!$this->GE3PController->isTheCursorEmpty($queryResult)) {
+                $result = $queryResult->toArray();
+            } else {
+                throw new \Exception("No DataValue Types found");
+            }
+
+        } catch (\Exception $e) {
+            Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
+            Log::error(__FUNCTION__, $e);
+            throw new \Exception("Problems getting the system DataValues");
+        }
+        return $result;
+    }
+
+    public function getAllLanguages()
+    {
+        $result = null;
+        try {
+            $dataValueTypeTable = TableRegistry::get("Language");
+            $queryResult = $dataValueTypeTable->find();
+
+            if (!$this->GE3PController->isTheCursorEmpty($queryResult)) {
+                $result = $queryResult->toArray();
+            } else {
+                throw new \Exception("No Languages found");
+            }
+
+        } catch (\Exception $e) {
+            Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
+            Log::error(__FUNCTION__, $e);
+            throw new \Exception("Problems getting the system DataValues");
+        }
+        return $result;
     }
 
 

@@ -10,6 +10,7 @@ namespace App\ControllerHelpers;
 
 
 use App\Controller\GE3PController;
+use Aura\Intl\Exception;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
 
@@ -218,6 +219,27 @@ class DataControllerHelper
             }
         }
         return $data;
+    }
+
+    public function getAllDataTypes()
+    {
+        $result = null;
+        try {
+            $dataTypeTable = TableRegistry::get("DataType");
+            $queryResult = $dataTypeTable->find();
+
+            if (!$this->GE3PController->isTheCursorEmpty($queryResult)) {
+                $result = $queryResult->toArray();
+            } else {
+                throw new \Exception("No Data Types found");
+            };
+
+        } catch (\Exception $e) {
+            Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
+            Log::error(__FUNCTION__, $e);
+            throw new \Exception($e->getMessage());
+        }
+        return $result;
     }
 
 

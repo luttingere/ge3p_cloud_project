@@ -9,7 +9,10 @@
 namespace App\ControllerHelpers;
 
 use App\Controller\GE3PController;
+use Cake\Core\Exception\Exception;
+use Cake\Filesystem\File;
 use Cake\Log\Log;
+use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 
 class ViewControllerHelper
@@ -223,6 +226,88 @@ class ViewControllerHelper
 
         }
         return $viewsValues;
+    }
+
+    public function generateViewJSON($viewId)
+    {
+        try
+        {
+            $data = $this->getById($viewId);
+            $finalPath = $data[0]["json_path"] . $data[0]["view_name"] . ".json";
+            $filePath = "/home/pablo_sierra/Cloud_Projects/ge3p_cms_project/" . $finalPath;
+            $data = json_encode($data);
+            $file = new File($filePath, true);
+            $file->write($data);
+            $file->close();
+            $data = array("path" => $finalPath, "full_path" => $filePath);
+            return $data;
+        }
+        catch (\Exception $e)
+        {
+            Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
+            Log::error(__FUNCTION__, $e);
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function checkIfChangesArePublished($viewId)
+    {
+        try
+        {
+            $data = $this->getById($viewId);
+            if($data[0]["published_dev"] == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        catch (\Exception $e)
+        {
+            Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
+            Log::error(__FUNCTION__, $e);
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function setViewChanges($viewId, $publish)
+    {
+        try
+        {
+
+            $viewsTable = TableRegistry::get("Views");
+            $viewObject = $viewsTable->newEntity();
+            $viewObject->view_id = $viewId;
+            if($publish)
+            {
+                if(!$this->checkIfChangesArePublished($viewId))
+                {
+                    $viewObject->published_dev = 1;
+                    $file = file_get_contents("/home/pablo_sierra/Cloud_Projects/ge3p_cms_project/_index.html");
+                    $version = new \DateTime();
+                    $editedFile = str_replace("@VERSION",$version->getTimestamp(), $file);
+                    file_put_contents("/home/pablo_sierra/Cloud_Projects/ge3p_cms_project/index.html", $editedFile);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                $viewObject->published_dev = 0;
+            }
+            $viewsTable->save($viewObject);
+            return true;
+        }
+        catch (\Exception $e)
+        {
+            Log::info("Error en " . __FUNCTION__ . " cause: " . $e->getMessage());
+            Log::error(__FUNCTION__, $e);
+            throw new \Exception($e->getMessage());
+        }
     }
 
 }

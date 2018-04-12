@@ -99,4 +99,29 @@ class DataController extends GE3PController
         parent::returnAJson($result);
     }
 
+    public function getAllDataTypes()
+    {
+        $result = null;
+        try {
+            //Variables esperadas por el servicio
+            $arrayToBeTested = array();
+            $result = parent::runWebServiceInitialConfAndValidations($arrayToBeTested, DATA_CONTROLLER_NAME_SPACE, __FUNCTION__);
+            if (parent::isASuccessfulResult($result[WEB_SERVICE_RESPONSE_SIGNATURE])) {
+
+                $jsonObject = $result[WEB_SERVICE_RESPONSE_SIGNATURE]['object'];
+
+                $dataControllerHelper = new DataControllerHelper($this);
+
+                $data = $dataControllerHelper->getAllDataTypes();
+
+                $result = parent::setSuccessfulResponseWithObject($result, $data);
+            }
+        } catch (\Exception $e) {
+            Log::info("Error, " . __FUNCTION__ . " cause: " . $e->getMessage());
+            Log::error(__FUNCTION__, $e);
+            $result = parent::setExceptionResponse($result, $e);
+        }
+        parent::returnAJson($result);
+    }
+
 }
